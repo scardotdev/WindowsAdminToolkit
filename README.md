@@ -19,3 +19,7 @@ Test-ScarPendingReboot
 Both return an object with `Status` (`Pending`, `NotDetected`, or `Indeterminate`) and per-indicator evidence. Read-only; no network access or telemetry. Some reboot conditions are not represented by these indicators.
 
 See [roadmap](docs/roadmap.md), [contributing](CONTRIBUTING.md), [security](SECURITY.md), and [agent instructions](AGENTS.md).
+
+## Disk Space Investigator
+
+Read-only, bounded diagnostics with volume capacity and an opt-in file scan. See [usage and limitations](docs/tools/disk-usage.md).
