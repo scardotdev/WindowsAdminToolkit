@@ -1,0 +1,23 @@
+name: Validate
+on:
+  push:
+  pull_request:
+jobs:
+  powershell:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        shell: [powershell, pwsh]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tooling
+        shell: ${{ matrix.shell }}
+        run: |
+          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+      - name: Build
+        shell: ${{ matrix.shell }}
+        run: ./tooling/Build.ps1
+      - name: Tests
+        shell: ${{ matrix.shell }}
+        run: ./tooling/Test.ps1
