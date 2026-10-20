@@ -10,7 +10,6 @@ Set-Content -LiteralPath (Join-Path $dest 'Test-PendingReboot.ps1') -Value $scri
 $diskSource=Join-Path $root 'src/ScarWinAdmin/Public/Get-ScarDiskUsage.ps1'
 $diskDest=Join-Path $OutputDirectory 'scripts/storage'
 New-Item -ItemType Directory -Force -Path $diskDest | Out-Null
-$diskScript="# Generated from src/ScarWinAdmin/Public/Get-ScarDiskUsage.ps1. Do not edit.`r`n" + (Get-Content -Raw $diskSource) + "`r`nGet-ScarDiskUsage @args`r`n"
 # Add param-block compatible script entrypoint: wrapper splats bound parameters as named arguments.
 $wrapper=@'
 [CmdletBinding()]
