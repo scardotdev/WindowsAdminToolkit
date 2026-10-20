@@ -24,8 +24,11 @@ Add-Indicator 'CBS.RebootPending' { Test-Path -LiteralPath 'HKLM:\SOFTWARE\Micro
 Add-Indicator 'CBS.RebootInProgress' { Test-Path -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootInProgress' -ErrorAction Stop }
 Add-Indicator 'WindowsUpdate.RebootRequired' { Test-Path -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' -ErrorAction Stop }
 Add-Indicator 'SessionManager.PendingFileRenameOperations' {
- $p=Get-ItemProperty -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager' -Name PendingFileRenameOperations -ErrorAction SilentlyContinue
- return ($null -ne $p -and $null -ne $p.PendingFileRenameOperations -and @($p.PendingFileRenameOperations).Count -gt 0)
+ # Read the existing key first: access/provider errors must propagate to Add-Indicator.
+ $p=Get-ItemProperty -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager' -ErrorAction Stop
+ $value=$p.PSObject.Properties['PendingFileRenameOperations']
+ if ($null -eq $value -or $null -eq $value.Value) { return $false }
+ return (@($value.Value).Count -gt 0)
 }
 Add-Indicator 'ComputerRename.Pending' {
  $current=(Get-ItemProperty -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName' -Name ComputerName -ErrorAction Stop).ComputerName
