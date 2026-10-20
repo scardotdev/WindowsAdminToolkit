@@ -13,8 +13,8 @@ jobs:
       - name: Install tooling
         shell: ${{ matrix.shell }}
         run: |
-          Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force
-          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+          Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -ErrorAction Stop
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -ErrorAction Stop
       - name: Build
         shell: ${{ matrix.shell }}
         run: ./tooling/Build.ps1
