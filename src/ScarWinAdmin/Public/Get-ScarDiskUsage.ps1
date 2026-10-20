@@ -40,6 +40,7 @@ if($PSBoundParameters.ContainsKey('Path')) {
  try {
   $root=(Get-Item -LiteralPath $Path -ErrorAction Stop)
   if(-not $root.PSIsContainer){ throw 'Path must refer to a directory.' }
+  if(($root.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'Scan root is a reparse point; refusing to follow it.' }
   $queue=New-Object 'System.Collections.Generic.Queue[object]'
   $queue.Enqueue([pscustomobject]@{ Directory=$root.FullName; Depth=0 })
   $timer=[Diagnostics.Stopwatch]::StartNew()
@@ -51,7 +52,11 @@ if($PSBoundParameters.ContainsKey('Path')) {
     foreach($item in $children) {
      if($timer.Elapsed.TotalSeconds -ge $TimeoutSeconds -or $scanned -ge $MaxItems){$truncated=$true;break}
      $scanned++
-     if(($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
+     if(($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+      $truncated=$true
+      $errors+=('Skipped reparse point: '+$item.FullName)
+      continue
+     }
      if($item.PSIsContainer) {
       if($entry.Depth -lt $MaxDepth){ $queue.Enqueue([pscustomobject]@{Directory=$item.FullName;Depth=$entry.Depth+1}) }
       else { $truncated=$true }
