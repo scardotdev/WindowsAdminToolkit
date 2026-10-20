@@ -6,9 +6,10 @@ Free, open-source Windows diagnostics, troubleshooting and automation with stand
 
 ## First utility: Pending Reboot Inspector
 
-Standalone:
+Standalone (generated from the module source):
 ```powershell
-.\scripts\maintenance\Test-PendingReboot.ps1
+.\tooling\Build.ps1
+.\out\scripts\maintenance\Test-PendingReboot.ps1
 ```
 Module:
 ```powershell
