@@ -27,3 +27,37 @@ Describe 'Disk Space Investigator' {
   $r.CollectionErrors.Count | Should -BeGreaterThan 0
  }
 }
+
+Describe 'Reparse point protections' -Skip:($env:OS -ne 'Windows_NT') {
+ BeforeAll { Import-Module $modulePath -Force }
+ It 'rejects a reparse-point root and reports a partial collection' {
+  $dir=Join-Path $TestDrive 'linked-root'
+  New-Item -ItemType Directory -Path $dir | Out-Null
+  Mock -ModuleName ScarWinAdmin Get-Item {
+   [pscustomobject]@{
+    FullName=$dir
+    PSIsContainer=$true
+    Attributes=[IO.FileAttributes]::Directory -bor [IO.FileAttributes]::ReparsePoint
+   }
+  }
+  $result=Get-ScarDiskUsage -Path $dir
+  $result.CollectionStatus | Should -Be 'Partial'
+  $result.CollectionErrors -join ' ' | Should -Match 'reparse point'
+  $result.ScannedItems | Should -Be 0
+ }
+ It 'reports a skipped reparse-point child as partial' {
+  $dir=Join-Path $TestDrive 'linked-child'
+  New-Item -ItemType Directory -Path $dir | Out-Null
+  Mock -ModuleName ScarWinAdmin Get-ChildItem {
+   @([pscustomobject]@{
+    FullName=(Join-Path $dir 'junction')
+    PSIsContainer=$true
+    Attributes=[IO.FileAttributes]::Directory -bor [IO.FileAttributes]::ReparsePoint
+   })
+  }
+  $result=Get-ScarDiskUsage -Path $dir -MaxDepth 1
+  $result.CollectionStatus | Should -Be 'Partial'
+  $result.ScanTruncated | Should -BeTrue
+  $result.CollectionErrors -join ' ' | Should -Match 'Skipped reparse point'
+ }
+}
