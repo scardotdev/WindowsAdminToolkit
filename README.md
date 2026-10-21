@@ -31,3 +31,7 @@ Read-only event triage, grouping, and evidence collection. See [usage and limita
 ## Network Diagnostics Bundle
 
 Local adapter, route and proxy inventory, with explicit opt-in DNS and TCP probes. See [usage](docs/tools/network-diagnostics.md).
+
+## Windows Health Snapshot
+
+Use `Get-ScarWindowsHealth` to aggregate host, CPU, memory, disk, reboot, event and optional local network evidence. See [health snapshot guide](docs/tools/windows-health.md).
