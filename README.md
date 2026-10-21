@@ -23,3 +23,7 @@ See [roadmap](docs/roadmap.md), [contributing](CONTRIBUTING.md), [security](SECU
 ## Disk Space Investigator
 
 Read-only, bounded diagnostics with volume capacity and an opt-in file scan. See [usage and limitations](docs/tools/disk-usage.md).
+
+## Windows Event Log Investigator
+
+Read-only event triage, grouping, and evidence collection. See [usage and limitations](docs/tools/event-summary.md).
