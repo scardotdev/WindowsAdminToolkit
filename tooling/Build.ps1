@@ -1,7 +1,9 @@
 [CmdletBinding()]
-param([string]$OutputDirectory=(Join-Path (Split-Path -Parent $PSScriptRoot) 'out'))
+param([string]$OutputDirectory)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
+# $PSScriptRoot is empty inside param defaults on Windows PowerShell 5.1, so default here.
+if (-not $OutputDirectory) { $OutputDirectory=Join-Path $root 'out' }
 $module=Join-Path $root 'src/ScarWinAdmin/Public/Test-ScarPendingReboot.ps1'
 $dest=Join-Path $OutputDirectory 'scripts/maintenance'
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
