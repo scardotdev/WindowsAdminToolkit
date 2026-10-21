@@ -7,17 +7,17 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
+        # The step-level `shell` key does not accept expressions, so each step
+        # runs under pwsh and launches the matrix PowerShell edition explicitly.
         shell: [powershell, pwsh]
+    defaults:
+      run:
+        shell: pwsh
     steps:
       - uses: actions/checkout@v4
       - name: Install tooling
-        shell: ${{ matrix.shell }}
-        run: |
-          Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -ErrorAction Stop
-          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force -ErrorAction Stop
+        run: ${{ matrix.shell }} -NoProfile -NonInteractive -Command '$ErrorActionPreference = "Stop"; Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force; Install-Module PSScriptAnalyzer -Scope CurrentUser -Force'
       - name: Build
-        shell: ${{ matrix.shell }}
-        run: ./tooling/Build.ps1
+        run: ${{ matrix.shell }} -NoProfile -NonInteractive -ExecutionPolicy Bypass -File ./tooling/Build.ps1
       - name: Tests
-        shell: ${{ matrix.shell }}
-        run: ./tooling/Test.ps1
+        run: ${{ matrix.shell }} -NoProfile -NonInteractive -ExecutionPolicy Bypass -File ./tooling/Test.ps1
