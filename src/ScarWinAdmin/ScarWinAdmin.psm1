@@ -2,4 +2,5 @@
 . $PSScriptRoot/Public/Get-ScarDiskUsage.ps1
 . $PSScriptRoot/Public/Get-ScarEventSummary.ps1
 . $PSScriptRoot/Public/Get-ScarNetworkDiagnostics.ps1
-Export-ModuleMember -Function Test-ScarPendingReboot, Get-ScarDiskUsage, Get-ScarEventSummary, Get-ScarNetworkDiagnostics
+. $PSScriptRoot/Public/Get-ScarWindowsHealth.ps1
+Export-ModuleMember -Function Test-ScarPendingReboot, Get-ScarDiskUsage, Get-ScarEventSummary, Get-ScarNetworkDiagnostics, Get-ScarWindowsHealth
