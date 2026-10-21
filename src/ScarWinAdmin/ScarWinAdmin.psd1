@@ -7,7 +7,7 @@
  Copyright='(c) 2026 SCAR.DEV. MIT licensed.'
  Description='Open-source Windows administration utilities.'
  PowerShellVersion='5.1'
- FunctionsToExport=@('Test-ScarPendingReboot','Get-ScarDiskUsage','Get-ScarEventSummary')
+ FunctionsToExport=@('Test-ScarPendingReboot','Get-ScarDiskUsage','Get-ScarEventSummary','Get-ScarNetworkDiagnostics')
  CmdletsToExport=@()
  AliasesToExport=@()
  VariablesToExport=@()

@@ -27,3 +27,7 @@ Read-only, bounded diagnostics with volume capacity and an opt-in file scan. See
 ## Windows Event Log Investigator
 
 Read-only event triage, grouping, and evidence collection. See [usage and limitations](docs/tools/event-summary.md).
+
+## Network Diagnostics Bundle
+
+Local adapter, route and proxy inventory, with explicit opt-in DNS and TCP probes. See [usage](docs/tools/network-diagnostics.md).
