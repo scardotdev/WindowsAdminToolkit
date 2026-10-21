@@ -131,11 +131,10 @@ foreach($entry in @(@{Path=$OutputJsonPath;Kind='Json'},@{Path=$OutputHtmlPath;K
  try {
   if($entry.Kind -eq 'Json'){$value=ConvertTo-Json -InputObject $result -Depth 16}
   else {
-   $encode=[System.Net.WebUtility]
    $rows=foreach($finding in $result.Findings){
-    '<tr><td>'+ $encode::HtmlEncode($finding.Severity) +'</td><td>'+ $encode::HtmlEncode($finding.Title) +'</td><td>'+ $encode::HtmlEncode($finding.Evidence) +'</td></tr>'
+    '<tr><td>'+ [System.Net.WebUtility]::HtmlEncode($finding.Severity) +'</td><td>'+ [System.Net.WebUtility]::HtmlEncode($finding.Title) +'</td><td>'+ [System.Net.WebUtility]::HtmlEncode($finding.Evidence) +'</td></tr>'
    }
-   $value='<!doctype html><html><head><meta charset="utf-8"><title>Windows Health Snapshot</title></head><body><h1>Windows Health Snapshot</h1><p>Collection: '+$encode::HtmlEncode($result.CollectionStatus)+' | Health: '+$encode::HtmlEncode($result.HealthStatus)+'</p><table><tr><th>Severity</th><th>Finding</th><th>Evidence</th></tr>'+($rows -join '')+'</table></body></html>'
+   $value='<!doctype html><html><head><meta charset="utf-8"><title>Windows Health Snapshot</title></head><body><h1>Windows Health Snapshot</h1><p>Collection: '+[System.Net.WebUtility]::HtmlEncode($result.CollectionStatus)+' | Health: '+[System.Net.WebUtility]::HtmlEncode($result.HealthStatus)+'</p><table><tr><th>Severity</th><th>Finding</th><th>Evidence</th></tr>'+($rows -join '')+'</table></body></html>'
   }
   $destination=$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($entry.Path)
   if((Test-Path -LiteralPath $destination) -and -not $Force){throw 'Output already exists.'}
