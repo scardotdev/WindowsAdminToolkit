@@ -64,5 +64,29 @@ param(
 '@
 $networkScript=$networkWrapper + "`r`n" + (Get-Content -Raw $networkSource) + "`r`nGet-ScarNetworkDiagnostics @PSBoundParameters`r`n"
 Set-Content -LiteralPath (Join-Path $networkDest 'Get-NetworkDiagnostics.ps1') -Value $networkScript -Encoding UTF8
+$healthDest=Join-Path $OutputDirectory 'scripts/health'
+New-Item -ItemType Directory -Force -Path $healthDest | Out-Null
+$healthWrapper=@'
+[CmdletBinding()]
+param(
+ [ValidateRange(1,168)][int]$EventLookbackHours=24,
+ [ValidateRange(1,5000)][int]$MaxEventsPerLog=500,
+ [string[]]$ServiceName=@(),
+ [ValidateRange(0,100)][double]$WarningDiskFreePercent=20,
+ [ValidateRange(0,100)][double]$CriticalDiskFreePercent=10,
+ [ValidateRange(0,100)][double]$WarningMemoryUsedPercent=85,
+ [ValidateRange(0,100)][double]$CriticalMemoryUsedPercent=95,
+ [ValidateRange(0,100)][double]$WarningCpuPercent=90,
+ [ValidateRange(10,600)][int]$TimeoutSeconds=90,
+ [switch]$IncludeNetwork,
+ [string]$OutputJsonPath,
+ [string]$OutputHtmlPath,
+ [switch]$Force
+)
+'@
+$dependencies=@('Test-ScarPendingReboot','Get-ScarDiskUsage','Get-ScarEventSummary','Get-ScarNetworkDiagnostics','Get-ScarWindowsHealth')
+$healthSources=@($dependencies | ForEach-Object { Get-Content -Raw (Join-Path $root ('src/ScarWinAdmin/Public/'+$_+'.ps1')) })
+$healthScript=$healthWrapper + "`r`n" + ($healthSources -join "`r`n") + "`r`nGet-ScarWindowsHealth @PSBoundParameters`r`n"
+Set-Content -LiteralPath (Join-Path $healthDest 'Get-WindowsHealth.ps1') -Value $healthScript -Encoding UTF8
 Copy-Item -Path (Join-Path $root 'src/ScarWinAdmin') -Destination $OutputDirectory -Recurse -Force
 Write-Output "Built artifacts in $OutputDirectory"
