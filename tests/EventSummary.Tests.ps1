@@ -1,6 +1,5 @@
-$modulePath=Join-Path $PSScriptRoot '../src/ScarWinAdmin/ScarWinAdmin.psd1'
+BeforeAll { Import-Module (Join-Path $PSScriptRoot '../src/ScarWinAdmin/ScarWinAdmin.psd1') -Force }
 Describe 'Windows Event Log Investigator' {
- BeforeAll { Import-Module $modulePath -Force }
  It 'exports the public command' {
   (Get-Command Get-ScarEventSummary).Name | Should -Be 'Get-ScarEventSummary'
  }

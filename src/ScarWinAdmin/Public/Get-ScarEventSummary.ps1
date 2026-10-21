@@ -91,8 +91,8 @@ $status=if($issues.Count -gt 0 -or $timedOut -or @($perLog | Where-Object Status
  CollectionStatus=$status
  LookbackHours=$LookbackHours
  TimedOut=$timedOut
- Logs=@($perLog)
+ Logs=$perLog.ToArray()
  GroupedEvents=$groups
- CollectionErrors=@($issues)
+ CollectionErrors=$issues.ToArray()
 }
 }
