@@ -4,8 +4,10 @@
 1. Pending Reboot Inspector (first implementation)
 2. Disk Space Investigator
 3. Event Log Investigator
-4. Network Diagnostics Bundle
-5. Windows Health Snapshot
+4. [Network Diagnostics Bundle (WAT-004)](specifications/WAT-004-network-diagnostics.md)
+5. [Windows Health Snapshot (WAT-001)](specifications/WAT-001-windows-health.md)
+
+Implementation contracts for WAT-004 and WAT-001 define scope, interfaces, output schemas, safety limits, tests, and release gates. Specifications are proposed until reviewed and merged.
 
 ## v0.2: security and inventory
 Certificate expiration, local administrator membership, scheduled tasks, service health, remote inventory.
