@@ -1,4 +1,3 @@
-$modulePath=Join-Path $PSScriptRoot '../src/ScarWinAdmin/ScarWinAdmin.psd1'
 Describe 'Network Diagnostics Bundle' {
  BeforeAll {
   $modulePath=Join-Path $PSScriptRoot '../src/ScarWinAdmin/ScarWinAdmin.psd1'
@@ -27,6 +26,35 @@ Describe 'Network Diagnostics Bundle' {
   Mock -ModuleName ScarWinAdmin Get-NetIPConfiguration {@()}
   Mock -ModuleName ScarWinAdmin Get-NetRoute {@()}
   $result=Get-ScarNetworkDiagnostics -SkipProxy
+  $result.CollectionStatus | Should -Be 'Partial'
+ }
+ It 'reports a connected address for a TCP probe on Windows' -Skip:($env:OS -ne 'Windows_NT') {
+  Mock -ModuleName ScarWinAdmin Get-NetAdapter {@()}
+  Mock -ModuleName ScarWinAdmin Get-NetIPConfiguration {@()}
+  Mock -ModuleName ScarWinAdmin Get-NetRoute {@()}
+  $listener=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0)
+  $listener.Start()
+  try {
+   $port=([Net.IPEndPoint]$listener.LocalEndpoint).Port
+   $result=Get-ScarNetworkDiagnostics -SkipProxy -TcpTarget '127.0.0.1' -TcpPort $port
+  } finally { $listener.Stop() }
+  $result.TcpTests[0].Status | Should -Be 'Passed'
+  $result.TcpTests[0].ConnectedAddress | Should -Be '127.0.0.1'
+ }
+ It 'resolves an explicit DNS target within the deadline on Windows' -Skip:($env:OS -ne 'Windows_NT') {
+  Mock -ModuleName ScarWinAdmin Get-NetAdapter {@()}
+  Mock -ModuleName ScarWinAdmin Get-NetIPConfiguration {@()}
+  Mock -ModuleName ScarWinAdmin Get-NetRoute {@()}
+  $result=Get-ScarNetworkDiagnostics -SkipProxy -DnsTarget '127.0.0.1'
+  $result.DnsTests[0].Status | Should -Be 'Passed'
+  $result.DnsTests[0].Answers | Should -Contain '127.0.0.1'
+ }
+ It 'reports a budget overrun even when no probe was skipped on Windows' -Skip:($env:OS -ne 'Windows_NT') {
+  Mock -ModuleName ScarWinAdmin Get-NetAdapter { Start-Sleep -Milliseconds 1200; @() }
+  Mock -ModuleName ScarWinAdmin Get-NetIPConfiguration {@()}
+  Mock -ModuleName ScarWinAdmin Get-NetRoute {@()}
+  $result=Get-ScarNetworkDiagnostics -SkipProxy -TimeoutSeconds 1
+  $result.TimedOut | Should -BeTrue
   $result.CollectionStatus | Should -Be 'Partial'
  }
 }

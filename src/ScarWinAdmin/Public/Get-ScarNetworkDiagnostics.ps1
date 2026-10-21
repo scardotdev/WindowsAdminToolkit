@@ -25,6 +25,7 @@ $errors=New-Object 'System.Collections.Generic.List[object]'
 $checks=New-Object 'System.Collections.Generic.List[object]'
 $adapters=@();$routes=@();$dns=@();$tcp=@();$proxy=[pscustomobject]@{Source='WinHTTP';Settings=$null;Status='Skipped'}
 $timedOut=$false
+$skipped=$false
 function Add-ScarNetworkCheck {
  param([string]$Name,[string]$Status,[string]$ErrorText,[object]$Evidence)
  $checks.Add([pscustomobject]@{Source=$Name;Status=$Status;EndedAtUtc=[datetime]::UtcNow.ToString('o');Evidence=$Evidence;Error=$ErrorText})
@@ -67,34 +68,48 @@ if(-not $SkipProxy){
  }
 }
 foreach($target in $DnsTarget){
- if($timer.Elapsed.TotalSeconds -ge $TimeoutSeconds){$timedOut=$true;break}
+ if($timer.Elapsed.TotalSeconds -ge $TimeoutSeconds){$timedOut=$true;$skipped=$true;break}
  $started=[Diagnostics.Stopwatch]::StartNew()
  try {
-  $addresses=@([Net.Dns]::GetHostAddresses($target) | ForEach-Object IPAddressToString)
-  $dns+= [pscustomobject]@{Target=$target;Status='Passed';Answers=$addresses;ElapsedMs=$started.ElapsedMilliseconds;Error=$null}
-  Add-ScarNetworkCheck 'DNS' 'Passed' $null $target
+  $remaining=[math]::Max(1,[math]::Min($PerTestTimeoutSeconds*1000,[int](($TimeoutSeconds-$timer.Elapsed.TotalSeconds)*1000)))
+  # The lookup itself cannot be cancelled; on deadline it is abandoned (at most 20 targets, so work stays bounded).
+  $task=[Net.Dns]::GetHostAddressesAsync($target)
+  if($task.Wait($remaining)){
+   $addresses=@($task.Result | ForEach-Object IPAddressToString)
+   $dns+= [pscustomobject]@{Target=$target;Status='Passed';Answers=$addresses;ElapsedMs=$started.ElapsedMilliseconds;Error=$null}
+   Add-ScarNetworkCheck 'DNS' 'Passed' $null $target
+  } else {
+   $dns+= [pscustomobject]@{Target=$target;Status='TimedOut';Answers=@();ElapsedMs=$started.ElapsedMilliseconds;Error='DNS lookup deadline exceeded.'}
+   Add-ScarNetworkCheck 'DNS' 'TimedOut' 'DNS lookup deadline exceeded.' $target
+  }
  } catch {
-  $dns+= [pscustomobject]@{Target=$target;Status='Failed';Answers=@();ElapsedMs=$started.ElapsedMilliseconds;Error=$_.Exception.Message}
-  Add-ScarNetworkCheck 'DNS' 'Failed' $_.Exception.Message $target
+  $message=if($_.Exception.InnerException){$_.Exception.InnerException.Message}else{$_.Exception.Message}
+  $dns+= [pscustomobject]@{Target=$target;Status='Failed';Answers=@();ElapsedMs=$started.ElapsedMilliseconds;Error=$message}
+  Add-ScarNetworkCheck 'DNS' 'Failed' $message $target
  }
 }
 for($i=0;$i -lt $TcpTarget.Count;$i++){
- if($timer.Elapsed.TotalSeconds -ge $TimeoutSeconds){$timedOut=$true;break}
+ if($timer.Elapsed.TotalSeconds -ge $TimeoutSeconds){$timedOut=$true;$skipped=$true;break}
  $client=New-Object Net.Sockets.TcpClient
  $started=[Diagnostics.Stopwatch]::StartNew()
- $status='Failed';$errorText=$null
+ $status='Failed';$errorText=$null;$connectedAddress=$null
  try{
   $remaining=[math]::Max(1,[math]::Min($PerTestTimeoutSeconds*1000,[int](($TimeoutSeconds-$timer.Elapsed.TotalSeconds)*1000)))
   $task=$client.ConnectAsync($TcpTarget[$i],$TcpPort[$i])
   if(-not $task.Wait($remaining)){$status='TimedOut';$errorText='Connection deadline exceeded.'}
-  elseif($client.Connected){$status='Passed'}
+  elseif($client.Connected){$status='Passed';$connectedAddress=([Net.IPEndPoint]$client.Client.RemoteEndPoint).Address.IPAddressToString}
   else{$errorText='Connection not established.'}
  }catch{$errorText=$_.Exception.Message}
  finally{$client.Dispose()}
- $tcp+= [pscustomobject]@{Target=$TcpTarget[$i];Port=$TcpPort[$i];Status=$status;ElapsedMs=$started.ElapsedMilliseconds;Error=$errorText}
+ $tcp+= [pscustomobject]@{Target=$TcpTarget[$i];Port=$TcpPort[$i];Status=$status;ConnectedAddress=$connectedAddress;ElapsedMs=$started.ElapsedMilliseconds;Error=$errorText}
  Add-ScarNetworkCheck 'TCP' $status $errorText ($TcpTarget[$i]+':'+$TcpPort[$i])
 }
-if($timedOut){Add-ScarNetworkCheck 'Budget' 'TimedOut' 'Overall time budget exhausted; some tests were not attempted.' $null}
+# Non-cancellable calls may overrun the budget; report that even when nothing was skipped.
+if($timer.Elapsed.TotalSeconds -ge $TimeoutSeconds){$timedOut=$true}
+if($timedOut){
+ $budgetMessage=if($skipped){'Overall time budget exhausted; some tests were not attempted.'}else{'Overall time budget exceeded by a non-cancellable operation; all requested tests ran.'}
+ Add-ScarNetworkCheck 'Budget' 'TimedOut' $budgetMessage $null
+}
 $partial=$timedOut -or @($checks | Where-Object {$_.Status -in @('Unavailable','TimedOut')}).Count -gt 0
 [pscustomobject]@{
  PSTypeName='ScarWinAdmin.NetworkDiagnosticsResult';SchemaVersion='1.0';Tool='ScarWinAdmin.NetworkDiagnostics'

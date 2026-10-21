@@ -14,7 +14,8 @@ No outbound probes are issued unless `-DnsTarget` or `-TcpTarget` is supplied. O
 
 ## Limitations and privacy
 
-- `TimeoutSeconds` is best-effort. Synchronous DNS lookup and Windows inventory calls cannot be forcibly interrupted, and may exceed the requested time budget. TCP attempts use per-test deadlines and disposed clients.
+- `TimeoutSeconds` is best-effort. Windows inventory calls cannot be forcibly interrupted and may exceed the requested time budget; an overrun is reported as `TimedOut` with `Partial` status. DNS and TCP probes use per-test deadlines (`PerTestTimeoutSeconds`, capped by the remaining budget); a timed-out DNS lookup is abandoned rather than cancelled (at most 20 targets, no extra concurrency).
+- TCP results include `ConnectedAddress` for successful probes. The full list of addresses attempted for a hostname is not captured, and failed probes carry no address.
 - `-SkipRoutes` and `-SkipProxy` omit those inventories. `-IncludeIPv6` adds IPv6 default routes.
 - The WinHTTP proxy setting is not a complete picture of browser/user proxy configurations.
 - Adapters, DNS, proxy and routes may expose internal infrastructure. Review results before sharing.
