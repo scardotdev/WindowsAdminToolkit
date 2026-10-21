@@ -10,3 +10,7 @@
 - Update documentation and examples for public behavior changes.
 - Do not weaken or delete failing tests just to pass CI.
 - Treat Windows-specific environment facts as unverified until tested.
+
+- **Never** wrap a `System.Collections.Generic.List[object]` with `@($list)` in a result-object literal. Use `$list.ToArray()` and test fully constructed output objects.
+- In Pester 5, initialize test fixtures and variables inside `BeforeAll` (not at test-file scope). Keep and extend `tests/Conventions.Tests.ps1`.
+- Exercise zero, one and multiple output rows, partial collection and standalone/module parity in Windows CI.
