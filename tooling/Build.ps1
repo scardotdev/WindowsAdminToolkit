@@ -27,5 +27,24 @@ param(
 '@
 $diskScript=$wrapper + "`r`n" + (Get-Content -Raw $diskSource) + "`r`nGet-ScarDiskUsage @PSBoundParameters`r`n"
 Set-Content -LiteralPath (Join-Path $diskDest 'Get-DiskUsage.ps1') -Value $diskScript -Encoding UTF8
+$eventSource=Join-Path $root 'src/ScarWinAdmin/Public/Get-ScarEventSummary.ps1'
+$eventDest=Join-Path $OutputDirectory 'scripts/diagnostics'
+New-Item -ItemType Directory -Force -Path $eventDest | Out-Null
+$eventWrapper=@'
+[CmdletBinding()]
+param(
+ [ValidateNotNullOrEmpty()][string[]]$LogName=@('System','Application'),
+ [ValidateRange(1,8760)][int]$LookbackHours=24,
+ [ValidateRange(1,100000)][int]$MaxEventsPerLog=1000,
+ [ValidateRange(1,100)][int]$Top=20,
+ [ValidateRange(1,10)][int]$SamplesPerGroup=3,
+ [ValidateRange(1,3600)][int]$TimeoutSeconds=30,
+ [ValidateSet(1,2,3,4,5)][int[]]$Level=@(1,2,3),
+ [int[]]$EventId,
+ [string[]]$ProviderName
+)
+'@
+$eventScript=$eventWrapper + "`r`n" + (Get-Content -Raw $eventSource) + "`r`nGet-ScarEventSummary @PSBoundParameters`r`n"
+Set-Content -LiteralPath (Join-Path $eventDest 'Get-WindowsEventSummary.ps1') -Value $eventScript -Encoding UTF8
 Copy-Item -Path (Join-Path $root 'src/ScarWinAdmin') -Destination $OutputDirectory -Recurse -Force
 Write-Output "Built artifacts in $OutputDirectory"
