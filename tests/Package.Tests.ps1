@@ -58,7 +58,7 @@ Describe 'Release package' -Skip:($env:OS -ne 'Windows_NT') {
   New-Item -ItemType Directory -Path $alone | Out-Null
   $file=Join-Path $alone (Split-Path -Leaf $Relative)
   Copy-Item -LiteralPath (Join-Path $script:package $Relative) -Destination $file
-  $command="Set-Location -LiteralPath '$alone'; if((Get-Module ScarWinAdmin) -or (Get-Command Get-Scar* -ErrorAction SilentlyContinue)){throw 'module commands already available'}; & '$file' $Arguments | ConvertTo-Json -Depth 16 -Compress"
+  $command="Set-Location -LiteralPath '$alone'; `$leak=@(Get-Module ScarWinAdmin | ForEach-Object { 'module:'+`$_.Path }) + @(Get-Command -Name Test-ScarPendingReboot,Get-ScarDiskUsage,Get-ScarEventSummary,Get-ScarNetworkDiagnostics,Get-ScarWindowsHealth -ErrorAction SilentlyContinue | ForEach-Object { `$_.Name+'@'+`$_.Source+' '+`$_.Module.Path }); if(`$leak.Count){throw ('module commands already available: '+(`$leak -join '; '))}; & '$file' $Arguments | ConvertTo-Json -Depth 16 -Compress"
   $run=Invoke-Isolated $command
   $run.ExitCode | Should -Be 0 -Because $run.Text
   $result=$run.Text | ConvertFrom-Json
