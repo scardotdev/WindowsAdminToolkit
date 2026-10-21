@@ -101,6 +101,6 @@ $partial=$timedOut -or @($checks | Where-Object {$_.Status -in @('Unavailable','
  ComputerName=$env:COMPUTERNAME;CollectedAtUtc=[datetime]::UtcNow.ToString('o')
  CollectionStatus=$(if($partial){'Partial'}else{'Complete'});TimedOut=$timedOut
  Adapters=@($adapters);DefaultRoutes=@($routes);DnsTests=@($dns);TcpTests=@($tcp)
- Proxy=$proxy;Checks=@($checks);Findings=@();CollectionErrors=@($errors)
+ Proxy=$proxy;Checks=$checks.ToArray();Findings=@();CollectionErrors=$errors.ToArray()
 }
 }
