@@ -140,7 +140,8 @@ Describe 'Windows Health Snapshot collection' -Skip:($env:OS -ne 'Windows_NT') {
   $parsed.Tool | Should -Be 'ScarWinAdmin.WindowsHealth'
   @($parsed.Services).Count | Should -Be 1
   @($parsed.SourceStatus).Count | Should -Be $result.SourceStatus.Count
-  $parsed.Host.LastBootUpTimeUtc | Should -Match '^\d{4}-\d{2}-\d{2}T'
+  # Check the raw text: PowerShell 7 converts ISO strings to DateTime when parsing.
+  Get-Content -LiteralPath $json -Raw | Should -Match '"LastBootUpTimeUtc":\s*"\d{4}-\d{2}-\d{2}T'
  }
  It 'encodes every dynamic value in the HTML report and renders coverage and evidence' {
   $html=Join-Path $TestDrive 'health.html'
