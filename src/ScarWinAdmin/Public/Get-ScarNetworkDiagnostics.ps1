@@ -97,7 +97,7 @@ for($i=0;$i -lt $TcpTarget.Count;$i++){
   $remaining=[math]::Max(1,[math]::Min($PerTestTimeoutSeconds*1000,[int](($TimeoutSeconds-$timer.Elapsed.TotalSeconds)*1000)))
   $task=$client.ConnectAsync($TcpTarget[$i],$TcpPort[$i])
   if(-not $task.Wait($remaining)){$status='TimedOut';$errorText='Connection deadline exceeded.'}
-  elseif($client.Connected){$status='Passed';$connectedAddress=([Net.IPEndPoint]$client.Client.RemoteEndPoint).Address.IPAddressToString}
+  elseif($client.Connected){$status='Passed';$remote=([Net.IPEndPoint]$client.Client.RemoteEndPoint).Address;if($remote.IsIPv4MappedToIPv6){$remote=$remote.MapToIPv4()};$connectedAddress=$remote.IPAddressToString}
   else{$errorText='Connection not established.'}
  }catch{$errorText=$_.Exception.Message}
  finally{$client.Dispose()}
