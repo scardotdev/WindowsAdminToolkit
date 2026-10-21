@@ -11,4 +11,12 @@
  CmdletsToExport=@()
  AliasesToExport=@()
  VariablesToExport=@()
+ PrivateData=@{
+  PSData=@{
+   Tags=@('Windows','Diagnostics','Troubleshooting','SysAdmin','ReadOnly')
+   LicenseUri='https://github.com/scardotdev/WindowsAdminToolkit/blob/main/LICENSE'
+   ProjectUri='https://github.com/scardotdev/WindowsAdminToolkit'
+   ReleaseNotes='https://github.com/scardotdev/WindowsAdminToolkit/blob/main/CHANGELOG.md'
+  }
+ }
 }

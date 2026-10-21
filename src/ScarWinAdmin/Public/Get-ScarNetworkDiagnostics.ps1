@@ -58,7 +58,9 @@ if(-not $SkipRoutes) {
 } else {Add-ScarNetworkCheck 'Routes' 'Skipped' $null $null}
 if(-not $SkipProxy){
  try {
-  $output=@(& netsh winhttp show proxy 2>&1)
+  # Fully qualified so a netsh.exe earlier on PATH or in the current directory cannot be run instead.
+  $netsh=Join-Path (Join-Path $env:SystemRoot 'System32') 'netsh.exe'
+  $output=@(& $netsh winhttp show proxy 2>&1)
   if($LASTEXITCODE -ne 0){throw "netsh returned exit code $LASTEXITCODE"}
   $proxy=[pscustomobject]@{Source='WinHTTP';Settings=($output -join [Environment]::NewLine);Status='Collected'}
   Add-ScarNetworkCheck 'Proxy' 'Passed' $null $null
