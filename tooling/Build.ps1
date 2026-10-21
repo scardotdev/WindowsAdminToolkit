@@ -46,5 +46,23 @@ param(
 '@
 $eventScript=$eventWrapper + "`r`n" + (Get-Content -Raw $eventSource) + "`r`nGet-ScarEventSummary @PSBoundParameters`r`n"
 Set-Content -LiteralPath (Join-Path $eventDest 'Get-WindowsEventSummary.ps1') -Value $eventScript -Encoding UTF8
+$networkSource=Join-Path $root 'src/ScarWinAdmin/Public/Get-ScarNetworkDiagnostics.ps1'
+$networkDest=Join-Path $OutputDirectory 'scripts/network'
+New-Item -ItemType Directory -Force -Path $networkDest | Out-Null
+$networkWrapper=@'
+[CmdletBinding()]
+param(
+ [string[]]$DnsTarget=@(),
+ [string[]]$TcpTarget=@(),
+ [ValidateRange(1,65535)][int[]]$TcpPort=@(),
+ [ValidateRange(1,120)][int]$TimeoutSeconds=30,
+ [ValidateRange(1,30)][int]$PerTestTimeoutSeconds=5,
+ [switch]$SkipRoutes,
+ [switch]$SkipProxy,
+ [switch]$IncludeIPv6
+)
+'@
+$networkScript=$networkWrapper + "`r`n" + (Get-Content -Raw $networkSource) + "`r`nGet-ScarNetworkDiagnostics @PSBoundParameters`r`n"
+Set-Content -LiteralPath (Join-Path $networkDest 'Get-NetworkDiagnostics.ps1') -Value $networkScript -Encoding UTF8
 Copy-Item -Path (Join-Path $root 'src/ScarWinAdmin') -Destination $OutputDirectory -Recurse -Force
 Write-Output "Built artifacts in $OutputDirectory"
