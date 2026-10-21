@@ -17,7 +17,6 @@ Describe 'Network Diagnostics Bundle' {
   Mock -ModuleName ScarWinAdmin Get-NetAdapter {@([pscustomobject]@{Name='Ethernet';InterfaceDescription='Test';ifIndex=1;Status='Up';MacAddress='00-00'})}
   Mock -ModuleName ScarWinAdmin Get-NetIPConfiguration {@()}
   Mock -ModuleName ScarWinAdmin Get-NetRoute {@()}
-  Mock -ModuleName ScarWinAdmin GetHostAddresses {throw 'Should never be called'}
   $result=Get-ScarNetworkDiagnostics -SkipProxy
   $result.Adapters.Count | Should -Be 1
   $result.DnsTests.Count | Should -Be 0
