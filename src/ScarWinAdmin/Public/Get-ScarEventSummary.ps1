@@ -58,7 +58,8 @@ foreach($log in $LogName){
   # 0x80070016 / 15007 can mean no matching events: avoid interpreting access failures as empty logs.
   $err=$_
   if($err.FullyQualifiedErrorId -match 'NoMatchingEventsFound' -or $err.Exception.Message -match 'No events were found that match'){
-   $perLog.Add([pscustomobject]@{LogName=$log;Collected=0;Capped=$false;Status='Complete'})
+   if($clock.Elapsed.TotalSeconds -ge $TimeoutSeconds){$timedOut=$true}
+   $perLog.Add([pscustomobject]@{LogName=$log;Collected=0;Capped=$false;Status=$(if($timedOut){'Partial'}else{'Complete'})})
   } else {
    $issues.Add([pscustomobject]@{LogName=$log;Error=$err.Exception.Message})
    $perLog.Add([pscustomobject]@{LogName=$log;Collected=0;Capped=$false;Status='Failed'})

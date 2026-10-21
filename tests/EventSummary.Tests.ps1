@@ -32,4 +32,10 @@ Describe 'Windows Event Log Investigator' {
   $result.CollectionStatus | Should -Be 'Partial'
   $result.Logs[0].Capped | Should -BeTrue
  }
+ It 'marks a slow no-match query as timed out and partial on Windows' -Skip:($env:OS -ne 'Windows_NT') {
+  Mock -ModuleName ScarWinAdmin Get-WinEvent { Start-Sleep -Milliseconds 1200; throw 'No events were found that match the specified selection criteria.' }
+  $result=Get-ScarEventSummary -LogName System -TimeoutSeconds 1
+  $result.TimedOut | Should -BeTrue
+  $result.CollectionStatus | Should -Be 'Partial'
+ }
 }
