@@ -1,7 +1,6 @@
-$modulePath=Join-Path $PSScriptRoot '../src/ScarWinAdmin/ScarWinAdmin.psd1'
+BeforeAll { Import-Module (Join-Path $PSScriptRoot '../src/ScarWinAdmin/ScarWinAdmin.psd1') -Force }
 Describe 'ScarWinAdmin Pending Reboot' {
  It 'exports the pending reboot command' {
-  Import-Module $modulePath -Force
   (Get-Command Test-ScarPendingReboot -ErrorAction Stop).Name | Should -Be 'Test-ScarPendingReboot'
  }
  It 'returns the expected status and evidence on Windows' -Skip:($env:OS -ne 'Windows_NT') {
@@ -12,9 +11,6 @@ Describe 'ScarWinAdmin Pending Reboot' {
 }
 
 Describe 'Pending file rename registry probe' -Skip:($env:OS -ne 'Windows_NT') {
- BeforeAll {
-  Import-Module $modulePath -Force
- }
  It 'returns Indeterminate when registry reads fail instead of a false negative' {
   Mock -ModuleName ScarWinAdmin Test-Path { $false }
   Mock -ModuleName ScarWinAdmin Get-ItemProperty { throw 'Simulated registry access denied' }

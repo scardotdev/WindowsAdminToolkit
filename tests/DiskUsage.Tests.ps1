@@ -1,6 +1,5 @@
-$modulePath=Join-Path $PSScriptRoot '../src/ScarWinAdmin/ScarWinAdmin.psd1'
+BeforeAll { Import-Module (Join-Path $PSScriptRoot '../src/ScarWinAdmin/ScarWinAdmin.psd1') -Force }
 Describe 'Disk Space Investigator' {
- BeforeAll { Import-Module $modulePath -Force }
  It 'exports Get-ScarDiskUsage' {
   (Get-Command Get-ScarDiskUsage -ErrorAction Stop).Name | Should -Be 'Get-ScarDiskUsage'
  }
@@ -29,7 +28,6 @@ Describe 'Disk Space Investigator' {
 }
 
 Describe 'Reparse point protections' -Skip:($env:OS -ne 'Windows_NT') {
- BeforeAll { Import-Module $modulePath -Force }
  It 'rejects a reparse-point root and reports a partial collection' {
   $dir=Join-Path $TestDrive 'linked-root'
   New-Item -ItemType Directory -Path $dir | Out-Null

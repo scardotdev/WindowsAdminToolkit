@@ -9,6 +9,7 @@ if ($issues.Count -gt 0) { throw ($issues | Out-String) }
 $config=New-PesterConfiguration
 $config.Run.Path=Join-Path $root 'tests'
 $config.Run.PassThru=$true
+$config.Run.Throw=$true
 $config.Output.Verbosity='Detailed'
 $result=Invoke-Pester -Configuration $config
-if ($null -eq $result -or $result.FailedCount -gt 0) { throw 'Pester validation failed.' }
+if ($null -eq $result -or ($result.FailedCount + $result.FailedBlocksCount + $result.FailedContainersCount) -gt 0) { throw 'Pester validation failed.' }
