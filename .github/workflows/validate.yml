@@ -14,7 +14,7 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install tooling
         run: ${{ matrix.shell }} -NoProfile -NonInteractive -Command '$ErrorActionPreference = "Stop"; Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force; Install-Module PSScriptAnalyzer -Scope CurrentUser -Force'
       - name: Build
