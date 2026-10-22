@@ -1,6 +1,6 @@
 # WAT-004 — Network Diagnostics Bundle: Implementation Specification
 
-**Status:** Proposed for v0.1 · **Type:** implementation contract · **Priority:** next after WAT-005  
+**Status:** Implemented in v0.1.0 (known gaps below) · **Type:** implementation contract  
 **Primary command:** `Get-ScarNetworkDiagnostics` · **Owner:** SCAR.DEV Windows Administrator Toolkit
 
 ## 1. Outcome and scope
@@ -89,18 +89,20 @@ Per-check status vocabulary: `Passed`, `Failed`, `Unavailable`, `Skipped`, `Time
 
 ## 6. Acceptance criteria / test matrix
 
-- [ ] No user-supplied targets ⇒ no outbound DNS/TCP probes (mock/spy).
-- [ ] Adapter/route/proxy inventory populates expected typed fields when supported.
+Ticked items are covered by an automated test or CI; unticked items are implemented but have no dedicated test yet, or are known gaps (see the [changelog](../../CHANGELOG.md)).
+
+- [x] No user-supplied targets ⇒ no outbound DNS/TCP probes (mock/spy).
+- [x] Adapter/route/proxy inventory populates expected typed fields when supported.
 - [ ] Zero, one and multiple adapters/routes/targets preserve JSON array shapes.
 - [ ] Requested DNS success, NXDOMAIN, timeout and resolver exception are distinguishable.
 - [ ] TCP open, refused, unroutable and deadline-expired results contain target+port+evidence.
-- [ ] Unavailable cmdlets, access-denied, per-check exceptions and exceeded budget yield `Partial` as appropriate rather than a false success.
-- [ ] Reject unmatched targets/ports, invalid ports, wildcard/range targets and oversized lists before any collection.
+- [x] Unavailable cmdlets, access-denied, per-check exceptions and exceeded budget yield `Partial` as appropriate rather than a false success.
+- [x] Reject unmatched targets/ports, invalid ports, wildcard/range targets and oversized lists before any collection.
 - [ ] A failed reachability probe is not conflated with failed collection.
 - [ ] Repeated tests respect caps and do not leave undisposed sockets.
-- [ ] Read-only behavior and opt-in network traffic covered by tests.
+- [x] Read-only behavior and opt-in network traffic covered by tests.
 - [ ] Both packaged standalone and imported module pass parameter-parity and schema-contract tests.
-- [ ] Both Windows PowerShell 5.1 and PowerShell 7 CI checks pass; Codex findings addressed before merge.
+- [x] Both Windows PowerShell 5.1 and PowerShell 7 CI checks pass; Codex findings addressed before merge.
 
 ## 7. Delivery plan
 

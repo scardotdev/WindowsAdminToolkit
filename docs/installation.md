@@ -1,5 +1,7 @@
 # Installation and verification
 
+New to this? Follow the step-by-step [quick-start guide in the README](../README.md#quick-start-guide-no-experience-needed) instead.
+
 Requirements: Windows with Windows PowerShell 5.1 or PowerShell 7. No elevation is required; sections that need more permission report `Partial` instead of failing silently. No internet access is needed after download.
 
 ## From a release
@@ -7,21 +9,25 @@ Requirements: Windows with Windows PowerShell 5.1 or PowerShell 7. No elevation 
 1. Download `ScarWinAdmin-v<version>.zip` and `SHA256SUMS.txt` from the GitHub release page.
 2. Verify the checksum (the printed hash must equal the value in `SHA256SUMS.txt`):
    ```powershell
-   (Get-FileHash .\ScarWinAdmin-v0.1.0.zip -Algorithm SHA256).Hash.ToLower()
+   (Get-FileHash .\ScarWinAdmin-v*.zip -Algorithm SHA256).Hash.ToLower()
    Get-Content .\SHA256SUMS.txt
    ```
-   The checksum only proves the file matches what was published alongside it. Releases are **not code-signed** in v0.1.0.
+   The checksum only proves the file matches what was published alongside it. Releases are **not code-signed**.
 3. Remove the "downloaded from the internet" mark, then extract:
    ```powershell
-   Unblock-File .\ScarWinAdmin-v0.1.0.zip
-   Expand-Archive .\ScarWinAdmin-v0.1.0.zip -DestinationPath .
+   Unblock-File .\ScarWinAdmin-v*.zip
+   Expand-Archive .\ScarWinAdmin-v*.zip -DestinationPath .
    ```
-4. Read the scripts before running them; they are plain text.
+4. Move into the extracted folder (it contains `module`, `scripts` and `docs`); the commands below assume you are inside it:
+   ```powershell
+   cd .\ScarWinAdmin-v*
+   ```
+5. Read the scripts before running them; they are plain text.
 
 ## Use the module
 
 ```powershell
-Import-Module .\ScarWinAdmin-v0.1.0\module\ScarWinAdmin\ScarWinAdmin.psd1
+Import-Module .\module\ScarWinAdmin\ScarWinAdmin.psd1
 Get-Command -Module ScarWinAdmin
 ```
 
@@ -32,7 +38,7 @@ To keep it available, copy the `ScarWinAdmin` folder into a directory listed in 
 Each script under `scripts\` is self-contained (it embeds the code it needs) and does not require the module:
 
 ```powershell
-.\ScarWinAdmin-v0.1.0\scripts\health\Get-WindowsHealth.ps1 -ServiceName Spooler
+.\scripts\health\Get-WindowsHealth.ps1 -ServiceName Spooler
 ```
 
 If your execution policy blocks it, keep the unblock step above and use `RemoteSigned`, or run a single process with `powershell -ExecutionPolicy Bypass -File <script>`. Do not weaken the machine-wide policy for this toolkit.

@@ -1,6 +1,6 @@
 # WAT-001 — Windows Health Snapshot: Implementation Specification
 
-**Status:** Proposed for v0.1 · **Type:** implementation contract · **Dependency:** WAT-002, WAT-003, WAT-005; WAT-004 optional  
+**Status:** Implemented in v0.1.0 · **Type:** implementation contract · **Dependency:** WAT-002, WAT-003, WAT-005; WAT-004 optional  
 **Primary command:** `Get-ScarWindowsHealth`
 
 ## 1. Outcome
@@ -107,23 +107,25 @@ HTML is a **static offline report** generated locally: summary, source coverage,
 
 ## 7. Acceptance criteria
 
-- [ ] Invoking the command with defaults is read-only, generates no files and performs no external network probes.
+Ticked items are covered by an automated test or CI; unticked items are implemented but have no dedicated test yet, or are known gaps (see the [changelog](../../CHANGELOG.md)).
+
+- [x] Invoking the command with defaults is read-only, generates no files and performs no external network probes.
 - [ ] Host/CPU/memory collection reports units, timestamp, provenance and missing-data semantics.
-- [ ] Disk/reboot/events data is consumed from existing commands, **not reimplemented**.
-- [ ] Service collection only runs for explicit names; missing/stopped/error cases are distinguishable.
-- [ ] `-IncludeNetwork` off means WAT-004 is not invoked; on means *inventory only*.
-- [ ] Child `Partial`/`Indeterminate`, failure and missing-command scenarios propagate accurately.
-- [ ] Whole-tool timeout and section skip logic do not present incomplete coverage as `NoFindings`.
+- [x] Disk/reboot/events data is consumed from existing commands, **not reimplemented**.
+- [x] Service collection only runs for explicit names; missing/stopped/error cases are distinguishable.
+- [x] `-IncludeNetwork` off means WAT-004 is not invoked; on means *inventory only*.
+- [x] Child `Partial`/`Indeterminate`, failure and missing-command scenarios propagate accurately.
+- [x] Whole-tool timeout and section skip logic do not present incomplete coverage as `NoFindings`.
 - [ ] Threshold ordering and 0/100 boundary cases tested; no divide-by-zero results.
-- [ ] Health and collection statuses are independent; observed critical findings remain visible with partial collection.
-- [ ] Findings deterministic, evidence-backed and never assert inferred root cause.
-- [ ] JSON schema round-trip, zero/one/many arrays, and static HTML escaping tested.
-- [ ] Reporting failures are explicit, no file overwrite without `-Force`, no automatic browser opening.
-- [ ] Generated standalone operates without module installation, has parameter/output parity with module.
-- [ ] Pester/ScriptAnalyzer/build pass on both Windows PowerShell 5.1 and 7; Codex review resolved before merge.
+- [x] Health and collection statuses are independent; observed critical findings remain visible with partial collection.
+- [x] Findings deterministic, evidence-backed and never assert inferred root cause.
+- [x] JSON schema round-trip, zero/one/many arrays, and static HTML escaping tested.
+- [x] Reporting failures are explicit, no file overwrite without `-Force`, no automatic browser opening.
+- [x] Generated standalone operates without module installation, has parameter/output parity with module.
+- [x] Pester/ScriptAnalyzer/build pass on both Windows PowerShell 5.1 and 7; Codex review resolved before merge.
 
 ## 8. Dependencies and sequencing
 
-**Hard dependencies:** existing WAT-002 `Test-ScarPendingReboot`, WAT-003 `Get-ScarDiskUsage`, WAT-005 `Get-ScarEventSummary`. **Optional dependency:** WAT-004 `Get-ScarNetworkDiagnostics` for an opt-in section. Implement WAT-004 first so the full v0.1 feature set is available, but WAT-001 must degrade predictably if optional network support is missing.
+**Hard dependencies:** existing WAT-002 `Test-ScarPendingReboot`, WAT-003 `Get-ScarDiskUsage`, WAT-005 `Get-ScarEventSummary`. **Optional dependency:** WAT-004 `Get-ScarNetworkDiagnostics` for an opt-in section. WAT-004 is implemented; WAT-001 still degrades predictably (an `Unavailable` network section, never a silent omission) if optional network support is missing.
 
 **Definition of done:** tested module and standalone script, example output schema, documented privilege/performance/privacy limits, and green CI on both Windows PowerShell versions. Merge and release are separate decisions.
