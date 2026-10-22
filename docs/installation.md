@@ -18,12 +18,16 @@ Requirements: Windows with Windows PowerShell 5.1 or PowerShell 7. No elevation 
    Unblock-File .\ScarWinAdmin-v*.zip
    Expand-Archive .\ScarWinAdmin-v*.zip -DestinationPath .
    ```
-4. Read the scripts before running them; they are plain text.
+4. Move into the extracted folder (it contains `module`, `scripts` and `docs`); the commands below assume you are inside it:
+   ```powershell
+   cd .\ScarWinAdmin-v*
+   ```
+5. Read the scripts before running them; they are plain text.
 
 ## Use the module
 
 ```powershell
-Import-Module .\ScarWinAdmin-v*\module\ScarWinAdmin\ScarWinAdmin.psd1
+Import-Module .\module\ScarWinAdmin\ScarWinAdmin.psd1
 Get-Command -Module ScarWinAdmin
 ```
 
@@ -34,7 +38,7 @@ To keep it available, copy the `ScarWinAdmin` folder into a directory listed in 
 Each script under `scripts\` is self-contained (it embeds the code it needs) and does not require the module:
 
 ```powershell
-.\ScarWinAdmin-v*\scripts\health\Get-WindowsHealth.ps1 -ServiceName Spooler
+.\scripts\health\Get-WindowsHealth.ps1 -ServiceName Spooler
 ```
 
 If your execution policy blocks it, keep the unblock step above and use `RemoteSigned`, or run a single process with `powershell -ExecutionPolicy Bypass -File <script>`. Do not weaken the machine-wide policy for this toolkit.
