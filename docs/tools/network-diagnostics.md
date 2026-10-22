@@ -20,4 +20,4 @@ No outbound probes are issued unless `-DnsTarget` or `-TcpTarget` is supplied. O
 - The WinHTTP proxy setting is not a complete picture of browser/user proxy configurations.
 - Adapters, DNS, proxy and routes may expose internal infrastructure. Review results before sharing.
 - No configuration changes, telemetry, external public-IP lookups or automatic remediation.
-- This initial implementation does not yet cover every acceptance criterion in the [WAT-004 specification](../specifications/WAT-004-network-diagnostics.md); CI and review are release gates.
+- Known gaps against the [WAT-004 specification](../specifications/WAT-004-network-diagnostics.md): the DNS NXDOMAIN/timeout and TCP refused/unroutable outcomes, multi-row array shapes and socket-disposal behavior are implemented but not yet covered by dedicated tests, and the attempted-address list is not captured (see above).
