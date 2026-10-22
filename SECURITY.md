@@ -1,6 +1,6 @@
 # Security policy
 
-Do not submit security vulnerabilities as public issues. Use GitHub private vulnerability reporting when available or contact the repository maintainers privately. Never attach unredacted diagnostic logs, credentials, or enterprise configurations. Version 0.x releases have no guaranteed maintenance window.
+Do not submit security vulnerabilities as public issues. Report privately using GitHub private vulnerability reporting: open the repository's **Security** tab and choose **Report a vulnerability**. Never attach unredacted diagnostic logs, credentials, or enterprise configurations. Version 0.x releases have no guaranteed maintenance window.
 
 ## Design properties
 
